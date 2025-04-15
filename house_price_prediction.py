@@ -69,6 +69,7 @@ def preprocess_train(X: pd.DataFrame, y: pd.Series):
     return filtered_x, filtered_y
 
 
+
 def preprocess_test(X: pd.DataFrame):
     """
     preprocess test data. You are not allowed to remove rows from X, but only edit its columns.
@@ -204,21 +205,14 @@ if __name__ == '__main__':
     avg_losses = []
     std_losses = []
     percentages = list(range(10,101))
-    # print(f"Train data shape: {pre_processed_train_df.shape}")
-    # print(f"Train target shape: {pre_processed_train_y.shape}")
-    # print(f"Test data shape: {pre_processed_test_df.shape}")
-    # print(f"Test target shape: {test_y.shape}")
     for p in percentages:
         losses = []
-        for _ in range(10):
+        for i in range(10):
             #   1) Sample p% of the overall training data
             fraction = p / 100
-            sampled_train_df = pre_processed_train_df.sample(frac=fraction, random_state=RANDOM_SEED)
-
+            sampled_train_df = pre_processed_train_df.sample(frac=fraction, random_state=RANDOM_SEED + i)
             #   2) Fit linear model (including intercept) over sampled set
-
             model.fit(sampled_train_df.to_numpy(), pre_processed_train_y[sampled_train_df.index].to_numpy())
-
             #   3) Test fitted model over test set
             #   4) Store average and variance of loss over test set
             loss = model.loss(pre_processed_test_df.to_numpy(), test_y.to_numpy())
@@ -235,17 +229,13 @@ if __name__ == '__main__':
     lower = np.array(avg_losses) - 2 * np.array(std_losses)
     upper = np.array(avg_losses) + 2 * np.array(std_losses)
 
-    print("Lower bound:", lower[:5])
-    print("Upper bound:", upper[:5])
-    print("Difference:", (upper - lower)[:5])
-
     plt.figure(figsize=(10, 6))
     plt.plot(percentages, avg_losses, label='Average Loss', color='blue')
     plt.fill_between(percentages,
                      lower,
                      upper,
-                     color='blue', alpha=0.5, label="± 2 Std Dev (normalized)")
-    plt.title("Normalized Loss vs. Training Data Size")
+                     color='blue', alpha=0.2, label="± 2 Std Dev")
+    plt.title("MSE vs. Training Data Size")
     plt.xlabel("Percentage of Training Data")
     plt.ylabel("Average Mean Squared Error (MSE)")
     plt.legend()
