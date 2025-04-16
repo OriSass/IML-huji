@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.ticker as mtick
 from linear_regression import LinearRegression
 
-RANDOM_SEED = 42
+RANDOM_SEED = 40
 YEARS_BACK_TO_CONSIDER = 35
 PLOT_DIR = "./plots"
 COLUMNS_TO_DROP = ['sqft_living15', 'sqft_lot15', 'id', 'sqft_above', 'sqft_basement', 'date', 'lat', 'long', 'waterfront', 'view']
@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     # Question 2 - split train test
     # Number of rows
-    n = len(X)
+    # n = len(X)
     # Set the proportion for training set
     train_size = 0.75  # 75% training, 25% testing
     # Shuffle the data and take a sample for the training set
