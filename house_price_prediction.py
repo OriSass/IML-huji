@@ -8,9 +8,8 @@ import matplotlib.ticker as mtick
 from linear_regression import LinearRegression
 
 RANDOM_SEED = 40
-YEARS_BACK_TO_CONSIDER = 35
 PLOT_DIR = "./plots"
-COLUMNS_TO_DROP = ['sqft_living15', 'sqft_lot15', 'id', 'sqft_above', 'sqft_basement', 'date', 'lat', 'long', 'waterfront', 'view']
+COLUMNS_TO_DROP = ['sqft_living15', 'sqft_lot15', 'id', 'sqft_above', 'sqft_basement', 'date', 'lat', 'long', 'condition', 'view']
 
 
 def preprocess_train(X: pd.DataFrame, y: pd.Series):

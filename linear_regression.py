@@ -54,11 +54,10 @@ class LinearRegression:
         if self._include_intercept:
             X = np.column_stack((np.ones(X.shape[0]), X))  # Add intercept term
 
-        # Solve the normal equations: (X^T X)^{-1} X^T y
         # The heart of linear regression
         # the result is a vector w = (w0,w1,...,wn)
         # it's meaning is the weight's that help us predict.
-        self._coefs = np.linalg.pinv(X.T @ X) @ X.T @ y
+        self._coefs = np.linalg.pinv(X) @ y  # Solves the normal equations: (X^T X)^{-1} X^T y
         self._fitted = True
 
     def predict(self, X: np.ndarray) -> np.ndarray:

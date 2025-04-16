@@ -1,12 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split
-
+from typing import Dict
 from polynomial_fitting import PolynomialFitting
 
 PLOT_DIR = "./plots"
 RANDOM_SEED = 40
+MINIMAL_K = 5
 
 
 def load_data(filename: str) -> pd.DataFrame:
@@ -129,24 +129,19 @@ def plot_monthly_avg_temp(df):
 
 
 # expects data from Israel only
-def evaluate_polynomial_fitting_israel(df: pd.DataFrame):
+def evaluate_polynomial_fitting_israel(israel_data: pd.DataFrame):
     # Get X and y
-    israel_data = df[df["Country"] == "Israel"].copy()
-    # israel_data = israel_data[["DayOfYear", "Temp"]].copy()
+    israel_data = israel_data[["DayOfYear", "Temp"]].copy()
 
-    X = israel_data["DayOfYear"].values
-    y = israel_data["Temp"].values
-
-    train_x, test_x, train_y, test_y = train_test_split(X, y, test_size=0.25, random_state=42)
     # Randomly sample 75% of the data for training
-    # train_df = israel_data.sample(frac=0.75, random_state=42)
-    # test_df = israel_data.drop(train_df.index)
-    #
-    # train_x = train_df["DayOfYear"].values.reshape(-1, 1)
-    # train_y = train_df["Temp"].values
-    #
-    # test_x = test_df["DayOfYear"].values.reshape(-1, 1)
-    # test_y = test_df["Temp"].values
+    train_df = israel_data.sample(frac=0.75, random_state=RANDOM_SEED)
+    test_df = israel_data.drop(train_df.index)
+
+    train_x = train_df["DayOfYear"].values
+    train_y = train_df["Temp"].values
+
+    test_x = test_df["DayOfYear"].values
+    test_y = test_df["Temp"].values
 
     test_errors = []
 
@@ -160,7 +155,16 @@ def evaluate_polynomial_fitting_israel(df: pd.DataFrame):
 
     # Plotting
     plt.figure(figsize=(8, 5))
-    plt.bar(range(1, 11), test_errors, color="skyblue")
+    bars = plt.bar(range(1, 11), test_errors, color="skyblue")
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,  # x position (center of bar)
+            height,  # y position (top of bar)
+            f'{height:.2f}',  # text (formatted to 2 decimals)
+            ha='center',  # horizontal alignment
+            va='bottom'  # vertical alignment
+        )
     plt.xlabel("Polynomial Degree (k)")
     plt.ylabel("Test MSE Loss")
     plt.title("Test Error of Polynomial Fitting on Israel Data")
@@ -171,18 +175,65 @@ def evaluate_polynomial_fitting_israel(df: pd.DataFrame):
     plt.show()
 
 
+def eval_israel_model_on_diff_countries(df: pd.DataFrame):
+    # Fit a model by israel
+    israel_data = df[df['Country'] == "Israel"]
+    israel_data = israel_data[["DayOfYear", "Temp"]].copy()
+
+    train_x = israel_data["DayOfYear"].values
+    train_y = israel_data["Temp"].values
+
+    model = PolynomialFitting(MINIMAL_K)
+    model.fit(train_x, train_y)
+
+    losses: Dict = {}
+
+    # Test a model by other countries
+    countries = [c for c in df['Country'].unique() if c != 'Israel']
+    for country in countries:
+        country_data = df[df['Country'] == country]
+        test_x = country_data["DayOfYear"].values
+        test_y = country_data["Temp"].values
+        loss = model.loss(test_x, test_y)
+        losses[country] = round(loss, 2)
+
+    sorted_losses = dict(sorted(losses.items(), key=lambda item: item[1]))
+        # Plotting the results
+    plt.figure(figsize=(12, 6))
+    colors = ['orange', 'green', 'red'] * (len(sorted_losses) // 3) + ['orange', 'green', 'red'][
+                                                                      :len(sorted_losses) % 3]
+    bars = plt.bar(sorted_losses.keys(), sorted_losses.values(), color=colors)
+    # Add text above each bar
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,  # x position (center of bar)
+            height,  # y position (top of bar)
+            f'{height:.2f}',  # text (formatted to 2 decimals)
+            ha='center',  # horizontal alignment
+            va='bottom'  # vertical alignment
+        )
+    plt.title(f"Model Loss by Country (Trained on Israel, k={MINIMAL_K})")
+    plt.xlabel("Country")
+    plt.ylabel("Loss (MSE)")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig("plots/polynomial/israel_model_loss_by_country.png")
+    plt.show()
+
+
+
 if __name__ == '__main__':
     # Question 2 - Load and preprocessing of city temperature dataset
     df = load_data("city_temperature.csv")
 
     # Question 3 - Exploring data for specific country
     israel_df = df[df['Country'] == "Israel"]
-    plot_temp_by_day(israel_df)
-    plot_monthly_temp_std(israel_df)
+    # plot_temp_by_day(israel_df)
+    # plot_monthly_temp_std(israel_df)
     # Question 4 - Exploring differences between countries
-    plot_monthly_avg_temp(df)
+    # plot_monthly_avg_temp(df)
     # Question 5 - Fitting model for different values of `k`
-    evaluate_polynomial_fitting_israel(df)
+    # evaluate_polynomial_fitting_israel(israel_df)
     # Question 6 - Evaluating fitted model on different countries
-
-    pass
+    eval_israel_model_on_diff_countries(df)
