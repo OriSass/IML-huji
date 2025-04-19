@@ -155,48 +155,8 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
         plt.close()
 
 
-if __name__ == '__main__':
-    df = pd.read_csv("house_prices.csv")  # dataframe - tabular data
-    X, y = df.drop("price", axis=1), df.price
-
-    # Question 2 - split train test
-    # Number of rows
-    # n = len(X)
-    # Set the proportion for training set
-    train_size = 0.75  # 75% training, 25% testing
-    # Shuffle the data and take a sample for the training set
-    train_df = X.sample(frac=train_size, random_state=RANDOM_SEED)
-    # Use the rest for the test set
-    test_df = X.drop(train_df.index)
-
-    # Extract target values for train and test
-    train_y = y[train_df.index]  # Target values corresponding to the training set
-    test_y = y[test_df.index]  # Target values corresponding to the test set
-
-    # Find the index where the NaN value in test_y is located
-    nan_index = test_y[test_y.isna()].index
-
-    # Remove the NaN value from test_y and the corresponding row in test_df
-    test_y = test_y.drop(nan_index)
-    test_df = test_df.drop(nan_index)
-
-    # After removing the row, check the result
-    # print(f"NaN values in test_y after removal: {test_y.isna().sum()}")
-    # print(f"Test data shape after removal: {test_df.shape}")
-
-    # Question 3 - preprocessing of housing prices train dataset
-    pre_processed_train_df, pre_processed_train_y = preprocess_train(train_df, train_y)
-    rows_cleaned = train_df.shape[0] - pre_processed_train_df.shape[0]
-    print(f"Pre-process cleaned: {rows_cleaned} rows")
-
-    # Question 4 - Feature evaluation of train dataset with respect to response
-    feature_evaluation(pre_processed_train_df, pre_processed_train_y, PLOT_DIR)
-    # Question 5 - preprocess the test data
-    pre_processed_test_df = preprocess_test(test_df)
-
-    # Question 6 - Fit model over increasing percentages of the overall training data
-    # For every percentage p in 10%, 11%, ..., 100%, repeat the following 10 times:
-
+def fit_model_increasing_percent():
+    
     # create a linear regression model
     model = LinearRegression(include_intercept=True)
 
@@ -242,6 +202,41 @@ if __name__ == '__main__':
     plt.savefig(f"{PLOT_DIR}/training_data_performance.png")
     plt.show()
 
+
+
+if __name__ == '__main__':
+    df = pd.read_csv("house_prices.csv")  # dataframe - tabular data
+    X, y = df.drop("price", axis=1), df.price
+
+    # Question 2 - split train test
+    train_size = 0.75  # 75% training, 25% testing
+    # Shuffle the data and take a sample for the training set
+    train_df = X.sample(frac=train_size, random_state=RANDOM_SEED)
+    # Use the rest for the test set
+    test_df = X.drop(train_df.index)
+
+    # Extract target values for train and test
+    train_y = y[train_df.index]  # Target values corresponding to the training set
+    test_y = y[test_df.index]  # Target values corresponding to the test set
+
+    # Find the index where the NaN value in test_y is located
+    nan_index = test_y[test_y.isna()].index
+
+    # Remove the NaN value from test_y and the corresponding row in test_df
+    test_y = test_y.drop(nan_index)
+    test_df = test_df.drop(nan_index)
+
+    # Question 3 - preprocessing of housing prices train dataset
+    pre_processed_train_df, pre_processed_train_y = preprocess_train(train_df, train_y)
+
+    # Question 4 - Feature evaluation of train dataset with respect to response
+    feature_evaluation(pre_processed_train_df, pre_processed_train_y, PLOT_DIR)
+    # Question 5 - preprocess the test data
+    pre_processed_test_df = preprocess_test(test_df)
+
+    # Question 6 - Fit model over increasing percentages of the overall training data
+    # For every percentage p in 10%, 11%, ..., 100%, repeat the following 10 times:
+    fit_model_increasing_percent()
 
 
 
