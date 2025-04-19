@@ -24,14 +24,6 @@ def load_data(filename: str) -> pd.DataFrame:
     # Load CSV with proper parsing of 'Date' column
     df = pd.read_csv(filename, parse_dates=["Date"])
 
-    # Drop rows with missing or duplicated data
-    # df.dropna(inplace=True)
-    # df.drop_duplicates(inplace=True)
-
-    # Remove invalid values (like negative temperatures or impossible days)
-    # df = df[df['Temp'] > 0]  # assuming -100°C as a hard cutoff for invalid temps
-    # df = df[df['Year'] >= 1900]  # optionally filter on year bounds
-    # df = df[df['Day'] > 0]  # basic sanity checks, if needed
     df = df[df["Temp"] > -50]
 
     # Add 'DayOfYear' column
@@ -125,7 +117,7 @@ def plot_monthly_avg_temp(df):
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(f"{PLOT_DIR}/avg_temp_vs_country.png")
-    # plt.show()
+    plt.show()
 
 
 # expects data from Israel only
@@ -133,15 +125,16 @@ def evaluate_polynomial_fitting_israel(israel_data: pd.DataFrame):
     # Get X and y
     israel_data = israel_data[["DayOfYear", "Temp"]].copy()
 
-    # Randomly sample 75% of the data for training
-    train_df = israel_data.sample(frac=0.75, random_state=RANDOM_SEED)
-    test_df = israel_data.drop(train_df.index)
+    sampled_df = israel_data.sample(frac=0.75, random_state=RANDOM_SEED)
+    test_sampled_df = israel_data.drop(sampled_df.index)
 
-    train_x = train_df["DayOfYear"].values
-    train_y = train_df["Temp"].values
+    # train data
+    train_x = sampled_df["DayOfYear"].values
+    train_y = sampled_df["Temp"].values
 
-    test_x = test_df["DayOfYear"].values
-    test_y = test_df["Temp"].values
+    # test data
+    test_x = test_sampled_df["DayOfYear"].values
+    test_y = test_sampled_df["Temp"].values
 
     test_errors = []
 
@@ -229,11 +222,11 @@ if __name__ == '__main__':
 
     # Question 3 - Exploring data for specific country
     israel_df = df[df['Country'] == "Israel"]
-    # plot_temp_by_day(israel_df)
-    # plot_monthly_temp_std(israel_df)
+    plot_temp_by_day(israel_df)
+    plot_monthly_temp_std(israel_df)
     # Question 4 - Exploring differences between countries
-    # plot_monthly_avg_temp(df)
+    plot_monthly_avg_temp(df)
     # Question 5 - Fitting model for different values of `k`
-    # evaluate_polynomial_fitting_israel(israel_df)
+    evaluate_polynomial_fitting_israel(israel_df)
     # Question 6 - Evaluating fitted model on different countries
     eval_israel_model_on_diff_countries(df)
