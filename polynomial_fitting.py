@@ -16,7 +16,7 @@ class PolynomialFitting(LinearRegression):
         k : int
             Degree of polynomial to fit
         """
-        super().__init__() # todo check if need to check false
+        super().__init__()
         self.k = k
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> NoReturn:
@@ -68,15 +68,6 @@ class PolynomialFitting(LinearRegression):
         loss : float
             Performance under MSE loss function
         """
-        # X_poly = self.__transform(X)
-        # print("X_poly shape:", X_poly.shape)
-        # print("y shape:", y.shape)
-        # assert X_poly.shape[0] == y.shape[0], "Mismatch in prediction input and labels"
-        #
-        # return super().loss(X_poly, y)
-        # x_poly = self.__transform(X)
-        # y_pred = super().predict(x_poly)
-        # return np.mean((y - y_pred) ** 2)
         return super().loss(X,y)
 
     def __transform(self, X: np.ndarray) -> np.ndarray:

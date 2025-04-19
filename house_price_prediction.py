@@ -125,11 +125,11 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
 
         # Calculate Pearson correlation manually
         cov = np.cov(x_feature, y)[0, 1]
-        std_x = np.std(x_feature, ddof=0)
-        std_y = np.std(y, ddof=0)
-        if std_x == 0 or std_y == 0:
+        standard_x = np.std(x_feature, ddof=0)
+        standard_y = np.std(y, ddof=0)
+        if standard_x == 0 or standard_y == 0:
             continue
-        corr = cov / (std_x * std_y)
+        corr = cov / (standard_x * standard_y)
 
         # Align x_feature and y by index
         valid_indices = x_feature.index.intersection(y.index)
@@ -233,7 +233,7 @@ if __name__ == '__main__':
     plt.fill_between(percentages,
                      lower,
                      upper,
-                     color='blue', alpha=0.2, label="± 2 Std Dev")
+                     color='blue', alpha=0.2, label="± 2 Standard Dev")
     plt.title("MSE vs. Training Data Size")
     plt.xlabel("Percentage of Training Data")
     plt.ylabel("Average Mean Squared Error (MSE)")
