@@ -8,7 +8,7 @@ import matplotlib.ticker as mtick
 from linear_regression import LinearRegression
 
 RANDOM_SEED = 40
-PLOT_DIR = "./plots"
+PLOT_DIR = "../plots"
 COLUMNS_TO_DROP = ['sqft_living15', 'sqft_lot15', 'id', 'sqft_above', 'sqft_basement', 'date', 'lat', 'long', 'condition', 'view']
 
 

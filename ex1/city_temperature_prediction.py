@@ -4,7 +4,7 @@ import seaborn as sns
 from typing import Dict
 from polynomial_fitting import PolynomialFitting
 
-PLOT_DIR = "./plots"
+PLOT_DIR = "../plots"
 RANDOM_SEED = 40
 MINIMAL_K = 5
 
